@@ -34,7 +34,7 @@ IRdecode  irDecoder;
 #define LED_TYPE    WS2811
 #define COLOR_ORDER GRB
 #define MAXENCODERPOS 500
-#define COLOR_INDEX_STEP 3
+#define COLOR_INDEX_STEP 7
 #define LED_FLASHSTEP 5
 #define UPDATES_PER_SECOND 100
 
@@ -66,6 +66,7 @@ void setup() {
   irReceiver.enableIRIn();
   Serial.begin(9600);
   Serial.println("KheRageIndicator");
+  drawGradient(1);
 }
 void debounceButton() {
   int reading = digitalRead(encoderSwitchPin);
@@ -190,25 +191,29 @@ void drawGradient(int rageValue)
   float ragePercent = MAXENCODERPOS / (float) rageValue;
   int numLedsLit    =  round(NUM_LEDS / ragePercent);
   numLedsLit = (numLedsLit < 1) ? 1 : numLedsLit;
-  uint8_t colorIndex = round(230 / ragePercent);
+  uint8_t colorIndex = round(255 / ragePercent);
   uint8_t brightness = 0;
-
+  uint8_t brightnessValue;
   if (rageValue < (MAXENCODERPOS - 75))
   {
-    brightness = colorIndex > 55 ? colorIndex : 55;
+    brightnessValue = colorIndex > 55 ? colorIndex : 55;
   }
   else
   {
-    brightness = ledFlashCounter % 256;
+    brightnessValue = 255;
   }
 
-  for ( int i = 0; i < 10; i++) {
+  for ( int i = 9; i >= 0; i--) {
     if (i >= numLedsLit)
     {
       brightness = 0;
     }
-    leds[i] = ColorFromPalette( currentPalette, colorIndex, brightness, currentBlending);
+    else
+    {
+      brightness = brightnessValue;
+    }
     colorIndex = (colorIndex  <=  COLOR_INDEX_STEP + 1) ? 1 : colorIndex - COLOR_INDEX_STEP;
+    leds[i] = ColorFromPalette( currentPalette, colorIndex, brightness, currentBlending);
   }
 }
 
