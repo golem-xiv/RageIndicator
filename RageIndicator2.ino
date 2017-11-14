@@ -7,7 +7,7 @@ enum PinAssignments {
   irReceiverPin    = 3,
   encoderPinA      = 2,
   encoderPinB      = 6,
-  encoderSwitchPin = 4, //TODO
+  encoderSwitchPin = 4,
   ledPin           = 5
 };
 
@@ -47,7 +47,7 @@ volatile uint16_t ledFlashCounter = 0;
 
 
 //Encoder Settings
-volatile unsigned int encoderPos = 0;
+volatile unsigned int encoderPos = 1;
 volatile unsigned int oldEncoderPos = 0;
 volatile boolean encoderIsrFired = false;
 volatile boolean encoderUpwards  = false;
@@ -97,6 +97,10 @@ void encoderChanged() {
     Serial.println();
     FastLED.show();
     FastLED.delay(1000 / UPDATES_PER_SECOND);
+    if (encoderPos == MAXENCODERPOS)
+    {
+      fuckYou();
+    }
   }
 }
 void loop()
@@ -118,16 +122,16 @@ void fuckYou() {
   //delay(100o);
   //servoFuckYou.detach();
 
-  for (pos = 0; pos <= 180; pos += 1) { // goes from 0 degrees to 180 degrees
+  for (pos = 0; pos <= 170; pos += 1) { // goes from 0 degrees to 180 degrees
     // in steps of 1 degree
     servoFuckYou.write(pos);              // tell servo to go to position in variable 'pos'
     delay(2);                       // waits 15ms for the servo to reach the position
   }
   delay(5000);                       // waits 15ms for the servo to reach the position
   Serial.println("And back!");
-  for (pos = 180; pos >= 1; pos -= 1) { // goes from 180 degrees to 0 degrees
+  for (pos = 170; pos >= 1; pos -= 1) { // goes from 180 degrees to 0 degrees
     servoFuckYou.write(pos);              // tell servo to go to position in variable 'pos'
-    delay(10);                       // waits 15ms for the servo to reach the position
+    delay(20);                       // waits 15ms for the servo to reach the position
   }
   servoFuckYou.detach();
   Serial.println("Servo fuckYou was detached!");
@@ -191,7 +195,7 @@ void drawGradient(int rageValue)
   float ragePercent = MAXENCODERPOS / (float) rageValue;
   int numLedsLit    =  round(NUM_LEDS / ragePercent);
   numLedsLit = (numLedsLit < 1) ? 1 : numLedsLit;
-  uint8_t colorIndex = round(255 / ragePercent);
+  uint8_t colorIndex = round(240 / ragePercent);
   uint8_t brightness = 0;
   uint8_t brightnessValue;
   if (rageValue < (MAXENCODERPOS - 75))
